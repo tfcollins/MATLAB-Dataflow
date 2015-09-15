@@ -1,5 +1,2 @@
-test1:
-	g++ testFlowMP.cpp -g -std=c++11 -lboost_thread -lboost_system -o test1
-clean:
-	rm test1
-
+test:
+	g++ -std=c++11 -lboost_thread -lboost_system -I../include -I../src -I../boost_1_49_0/stage/lib -I../boost_1_49_0/boost testFlowMP.cpp -o testExec -v
