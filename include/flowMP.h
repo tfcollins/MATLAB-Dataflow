@@ -11,7 +11,9 @@
 #include <boost/scoped_ptr.hpp>
 #include <vector>
 #include <time.h>
-#include <sys/prctl.h>
+#ifdef UNIX
+  #include <sys/prctl.h>
+#endif
 
 // If queue grows large warn since memory may be fully consumed eventually
 #define WARNINGQSIZE 300
@@ -23,7 +25,7 @@
 template<class T>
 void* consumeOut(T in)
 {
- return (void*) in;   
+ return (void*) in;
 }
 
 // Type declarations
@@ -39,7 +41,7 @@ public:
     std::function<voidvec(voidvec,int*)> m_ProcessData;
     std::function<void()> m_FunctionInit;
     std::function<void()> m_FunctionCleanup;
-    
+
     // Constructor
     Worker(std::function<voidvec(voidvec,int*)> ProcessData,
             int numInputs, int numOutputs,
@@ -77,7 +79,7 @@ public:
             boost::shared_ptr<std::queue<void*>> sptr4 (new std::queue<void*>);
             m_OutputQueues.push_back(sptr4);
         }
-        
+
     }
 
     // Parameters
@@ -85,7 +87,7 @@ public:
     boost::thread                                  m_BlockThread;
     int m_NumInputs;
     int m_NumOutputs;
-    // MIMO Parameters    
+    // MIMO Parameters
     std::vector<boost::shared_ptr<std::atomic<int>>>            m_InputQueueSizes;
     std::vector<boost::shared_ptr<std::atomic<int>>>            m_OutputQueueSizes;
     std::vector<boost::shared_ptr<boost::mutex>>                m_InputMutexs;
@@ -95,7 +97,7 @@ public:
     std::vector<boost::shared_ptr<std::queue<void*>>>           m_InputQueues;
     std::vector<boost::shared_ptr<std::queue<void*>>>           m_OutputQueues;
     std::string m_BlockName;
-    
+
     //Destructor
     ~Worker()
     {
@@ -115,14 +117,14 @@ voidvec readFromInputQueues()
     {
         inputs[inport] = readFromInputQueue(inport);
     }
-        
+
     return inputs;
-    
+
 }
 // Get data from queue
 void* readFromInputQueue(int inport)
-{   
-   
+{
+
     // Wait for data
     if (*(m_InputQueueSizes[inport]) == 0){
         // Wait for signal
@@ -132,15 +134,15 @@ void* readFromInputQueue(int inport)
     }
     else if ((*(m_InputQueueSizes[inport]))>WARNINGQSIZE)
         std::cout<<"Input Queue Size: "<<(*(m_InputQueueSizes[inport]))<<" | "<< m_BlockName << std::endl;
-        
+
     // When data is ready read it off queue
     boost::lock_guard<boost::mutex> lock(*(m_InputMutexs[inport]));
     void* data = (*(m_InputQueues[inport])).front();
     (*(m_InputQueues[inport])).pop();
-    
+
     // Update queue size atomic
     (*(m_InputQueueSizes[inport]))--;
-        
+
     return data;
 }
 
@@ -161,24 +163,25 @@ void addToOutputQueue(void* processedData, int outport)
     boost::lock_guard<boost::mutex> lock(*(m_OutputMutexs[outport]));
     (*(m_OutputQueues[outport])).push(processedData);
     (*(m_OutputQueueSizes[outport]))++;
-    
+
     // Notify next block
     (*(m_OutputConds[outport])).notify_one();
-    
+
 }
 
 // In and Out Process Block
 void block()
 {
+    #ifdef UNIX
     prctl(PR_SET_NAME,m_BlockName.c_str(),0,0,0);
-    
+    #endif
     voidvec data;
     voidvec processedData;
     int flag = 0;
-    
+
     // Initialize threaded function
     m_FunctionInit();
-    
+
     while (!m_StopThread)
     {
         //Read Data
@@ -191,7 +194,7 @@ void block()
     }
     // Cleanup after threaded function
     m_FunctionCleanup();
-    
+
     // Notify when thread completes
     std::cout << "Thread Done: " << boost::this_thread::get_id() << '\n';
 
@@ -200,10 +203,13 @@ void block()
 // Source Block
 void block_source()
 {
+    #ifdef UNIX
     prctl(PR_SET_NAME,m_BlockName.c_str(),0,0,0);
+    #endif
 
     // Delay startup, to make sure all blocks have started
-    usleep(10000000);
+    int usec = 1000;
+    boost::this_thread::sleep(boost::posix_time::microseconds(usec));
 
     voidvec data;
     voidvec processedData;
@@ -211,7 +217,7 @@ void block_source()
 
     // Initialize threaded function
     m_FunctionInit();
-    
+
     while (!m_StopThread)
     {
         //Process Data
@@ -224,7 +230,7 @@ void block_source()
     }
     // Cleanup after threaded function
     m_FunctionCleanup();
-    
+
     // Notify when thread completes
     std::cout << "Thread Done: " << boost::this_thread::get_id() << '\n';
 
@@ -232,7 +238,9 @@ void block_source()
 // Sink Block
 void block_sink()
 {
+    #ifdef UNIX
     prctl(PR_SET_NAME,m_BlockName.c_str(),0,0,0);
+    #endif
 
     voidvec data;
     voidvec processedData;
@@ -240,7 +248,7 @@ void block_sink()
 
     // Initialize threaded function
     m_FunctionInit();
-    
+
     while (!m_StopThread)
     {
         //Read Data
@@ -249,10 +257,10 @@ void block_sink()
         //Process Data
         processedData = m_ProcessData(data,&flag);
     }
-    
+
     // Cleanup after threaded function
     m_FunctionCleanup();
-    
+
     // Notify when thread completes
     std::cout << "Thread Done: " << boost::this_thread::get_id() << '\n';
 
@@ -274,7 +282,7 @@ void run_sink()
 
 /*
 // Connect blocks together
-void ConnectBlocks(Worker &aBlock, int outport, Worker &bBlock, int inport) 
+void ConnectBlocks(Worker &aBlock, int outport, Worker &bBlock, int inport)
 {
 	// Map mutexes
 	bBlock.m_InputMutexs[inport] = aBlock.m_OutputMutexs[outport];
@@ -324,4 +332,3 @@ OUT readFromQueue(Worker<IN,OUT> &aBlock)
 
 }
  */
-

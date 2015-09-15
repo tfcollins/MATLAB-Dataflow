@@ -7,7 +7,7 @@
 void* none;
 
 // Connect blocks together
-void connect(Worker &aBlock, int outport, Worker &bBlock, int inport) 
+void connect(Worker &aBlock, int outport, Worker &bBlock, int inport)
 {
 	// Map mutexes
 	bBlock.m_InputMutexs[inport] = aBlock.m_OutputMutexs[outport];
@@ -46,7 +46,8 @@ template<typename U>
 void Shutdown(U block)
 {
     (*block).m_StopThread = true;
-    usleep(100);
+		int usec = 100;
+    boost::this_thread::sleep(boost::posix_time::microseconds(usec));
     (*block).m_BlockThread.join();
 }
 
@@ -55,7 +56,8 @@ void Shutdown(U block, Args ...args)
 {
     (*block).m_StopThread = true;
     (*block).m_BlockThread.join();
-    usleep(100);
+		int usec = 100;
+    boost::this_thread::sleep(boost::posix_time::microseconds(usec));
     Shutdown( args... );
 }
 template<typename ...Args>
@@ -64,7 +66,7 @@ void StopSim(Args ...args)
     std::cout<<"INFO>> ------SHUTTING DOWN------\n";
     std::cout<<"INFO>> Waiting for threads to quit\n";
     std::cout<<"INFO>> Ignore errors that may follow\n";
-    
+
     try
         {Shutdown(args...);}
     catch(...)
@@ -76,7 +78,10 @@ void SimDuration(double duration)
     std::cout<<"INFO>> Running simulation for "<<duration<<" seconds\n";
     std::cout<<"INFO>> Main thread sleeping\n";
     for(int j=0;j<duration;j++)
-        usleep(ONESECOND);
+		{
+			int usec = ONESECOND;
+			boost::this_thread::sleep(boost::posix_time::microseconds(usec));
+		}
     std::cout<<"INFO>> Main thread done sleeping\n";
 }
 

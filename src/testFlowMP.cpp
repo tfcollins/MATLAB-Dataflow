@@ -12,7 +12,9 @@ using namespace std;
 /////////////////////////////////////////////////
 OUTPUTS Source(INPUTS input, int *flag)
 {
-    usleep(1000);// Slow this down so we don't max out the core
+    // Slow this down so we don't max out the core
+    int usec = 1000;
+    boost::this_thread::sleep(boost::posix_time::microseconds(usec));
 
     // Setup output
     double *data = new double[10];
@@ -57,55 +59,19 @@ int main()
     // Connect blocks together
     connect(block1, 0, block2, 0);
 
-    // Turn blocks on
-    block1.run_source();
-    block2.run_sink();
+    //// Create graph and add blocks ////
+    Graph TestGraph("2 Block Test Graph");
+    TestGraph.Blocks = {&block1,&block2};
 
-    // Setup Timers
-    clock_t init, final, mid;
-    init=clock();
+    // Label Sources and Sinks (Strings from block thread names)
+    TestGraph.Sources = {"SRC"};
+    TestGraph.Sinks = {"SINK"};
 
-    // Wait for Blocks to start
-    for(int k=0;k<1000;k++)
-        usleep(100000);
-    cout<<"Blocks should be started now\n";
-
-    // Monitor Queues
-    /*
-    for (int j=0; j<10000; j++)
-    {
-        usleep(10000);
-
-        int b1Qout = *(block1.m_OutputQueueSize);
-        int b2Qin = *(block2.m_InputQueueSize);
-
-        if (b1Qout>10)
-            cout<<"block1 Output Queue Large, Size: "<<b1Qout<<endl;
-        if (b2Qin>10)
-            cout<<"block2 Input Queue Large, Size: "<<b2Qin<<endl;
-
-    }
-    */
-    cout<<"Main thread sleeping\n";
-
-    for(int j=0;j<100;j++)
-        usleep(100);
-
-    cout<<"Main thread done sleeping\n";
-
-    // Stop Timers
-    final=clock()-init;
-    cout << (double)final / ((double)CLOCKS_PER_SEC) << " Seconds" << endl;
-
-    // Shutdown
-    cout<<"------SHUTTING DOWN------\n";
-    cout<<"Waiting for thread to quit\n";
-    block1.m_StopThread = true;
-    block2.m_StopThread = true;
-    usleep(1000000);
-    block1.m_BlockThread.join();
-    usleep(1000000);
-    block2.m_BlockThread.join();
+    //// Run Graph ////
+    cout<<"MAIN>> Type: 'top -H -p `pidof RX`' in a terminal to view thread utilization\n";
+    double SimDuration = 60;// set SimDuration<=0 for continuous run
+    cout<<"Starting up (purposely delayed)\n";
+    TestGraph.run(SimDuration);// Turn blocks on
 
     return 0;
 }

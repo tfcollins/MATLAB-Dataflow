@@ -12,11 +12,11 @@ public:
     std::vector<Worker*> Blocks;
     std::vector<std::string> Sources;
     std::vector<std::string> Sinks;
-    
+
     // Destructor
     //~Graph();
 
-    
+
 
 // Run graph
 void run(double duration)
@@ -29,7 +29,7 @@ void run(double duration)
                 //std::cout<<(*Blocks[b]).m_BlockName<<" is a sink\n";
                 (*Blocks[b]).run_sink();
             }
-                
+
     // Setup in and out blocks
     for (int b=0;b<Blocks.size();b++)
         for (int n=0;n<Sinks.size();n++)
@@ -39,7 +39,7 @@ void run(double duration)
                 //std::cout<<(*Blocks[b]).m_BlockName<<" is a block\n";
                 (*Blocks[b]).run();
             }
-    
+
     // Setup Source(s)
     for (int b=0;b<Blocks.size();b++)
         for (int n=0;n<Sinks.size();n++)
@@ -48,11 +48,11 @@ void run(double duration)
                 //std::cout<<(*Blocks[b]).m_BlockName<<" is a source\n";
                 (*Blocks[b]).run_source();
             }
-    
+
     // Setup Timers
     clock_t init, final, mid;
     init=clock();
-    
+
     // Run simulation for awhile
     if (duration>0)
         SimDuration(duration); //Seconds
@@ -61,14 +61,14 @@ void run(double duration)
         std::cout<<"INFO>> Press Enter to stop\n";
         std::cin.ignore();
     }
-        
+
     // Stop Timers
     final=clock()-init;
     std::cout << "INFO>> Test duration: " << (double)final / ((double)CLOCKS_PER_SEC) << " Seconds" << std::endl;
-    
+
     // Shutdown
     shutdown();
-    
+
 }
 
 // Stop graph
@@ -83,7 +83,8 @@ void shutdown()
         {
             (*Blocks[b]).m_StopThread = true;
             (*Blocks[b]).m_BlockThread.join();
-            usleep(100);
+            int usec = 100;
+            boost::this_thread::sleep(boost::posix_time::microseconds(usec));
         }
         catch (...)
         {}

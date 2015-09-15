@@ -30,27 +30,27 @@ int main()
     // Initialization_function: Function name produced by MATLAB coder to be called before function is called
     // Termination_function: Function name produced by MATLAB coder to be called after function is never to be called again
     // Thread_Name: String that will help monitor different threads is programs like 'top'
-    
+
     Worker block1(CRCSource, 0, 1, RX_initialize, RX_terminate, "CRC Source");
     Worker block2(CRCSink,   1, 0, RX_initialize, RX_terminate, "CRC Sink");
 
     //// Connect blocks together (Port numbers start with 0) ////
     connect(block1, 0, block2, 0);
-        
+
     //// Create graph and add blocks ////
     Graph Receiver("WLAN RX");
     Receiver.Blocks = {&block1,&block2};
-                       
+
     // Label Sources and Sinks (Strings from block thread names)
     Receiver.Sources = {"CRC Source"};
     Receiver.Sinks = {"CRC Sink"};
-    
+
     //// Run Graph ////
     cout<<"MAIN>> Type: 'top -H -p `pidof RX`' in a terminal to view thread utilization\n";
     double SimDuration = 60;// set SimDuration<=0 for continuous run
     cout<<"Starting up (purposely delayed)\n";
     Receiver.run(SimDuration);// Turn blocks on     
-    
+
 
     return 0;
 }
