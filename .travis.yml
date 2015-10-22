@@ -1,0 +1,7 @@
+language: C++
+
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -y libboost-all-dev
+
+script: cd src && make test
