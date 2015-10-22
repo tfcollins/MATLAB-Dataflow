@@ -11,7 +11,7 @@ if ispc % Windows
     cfg.CustomLibrary = 'C:\Boost\lib\';
     cfg.CustomInclude = 'C:\Boost\include\boost-1_49\';
 end
-cfg.CustomInclude = 'cpp/';
+cfg.CustomInclude = 'src/:include/';
 cfg.TargetLang='C++';
 cfg.PostCodeGenCommand = 'setbuildargsBoost(buildInfo)';
 cfg.BuildConfiguration='Faster Runs';
