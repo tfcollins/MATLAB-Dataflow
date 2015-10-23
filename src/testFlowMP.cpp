@@ -35,8 +35,8 @@ OUTPUTS Sink(INPUTS input, int *flag)
 
     // Process
     // Process
-    for(int index=0; index<10; index++)
-        cout << "data: " << data[index] << endl;
+    //for(int index=0; index<10; index++)
+    //    cout << "data: " << data[index] << endl;
 
     //Cleanup
     delete data;
@@ -72,6 +72,7 @@ int main()
     double SimDuration = 60;// set SimDuration<=0 for continuous run
     cout<<"Starting up (purposely delayed)\n";
     TestGraph.run(SimDuration);// Turn blocks on
+    cout<<"Test complete\n";
 
     return 0;
 }

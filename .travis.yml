@@ -28,7 +28,7 @@ install:
 
 # run test
 script:
- - cd src && make test && testExec
+ - cd src && make test && ./testExec
 
 
 
