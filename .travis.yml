@@ -9,16 +9,27 @@ addons:
   apt:
     sources:
     - ubuntu-toolchain-r-test
+    - boost-latest
     packages:
     - gcc-4.8
     - g++-4.8
+    - libboost1.55-all-dev
+    - cmake
+
+install:
+- if [ "$CXX" = "g++" ]; then export CXX="g++-4.8 -std=c++11" CC="gcc-4.8"; fi
 
 # install boost
-before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -y libboost-all-dev
-  - sudo apt-get install -y libboost-dev libboost-regex-dev
-  - sudo apt-get install -y libstdc++-4.8-dev
+#before_install:
+#  - sudo apt-get update -qq
+#  - sudo apt-get install -y libboost-all-dev
+#  - sudo apt-get install -y libboost-dev libboost-regex-dev
+#  - sudo apt-get install -y libstdc++-4.8-dev
 
 # run test
-script: cd src && make test
+script:
+ - cd src && make test
+ - cd src && make testOther
+
+
+
