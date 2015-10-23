@@ -1,7 +1,13 @@
+# Travis-CI build config
 language: C++
+
+# need sudo for boost install
 sudo: required
+
+# install boost
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -y libboost-all-dev
 
+# run test
 script: cd src && make test
