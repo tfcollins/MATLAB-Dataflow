@@ -6,7 +6,7 @@ assert(isa(codeword, 'logical') && isreal(codeword) && all(size(codeword) == [18
 persistent crcDetect
 
 if isempty(crcDetect)
-    crcDetect   = comm.CRCDetector('z^3 + 1', 'ChecksumsPerFrame',2);
+    crcDetect   = comm.CRCDetector([1 0 0 1], 'ChecksumsPerFrame',2);
 end
 % Decode messages with and without errors using a CRC decoder
 [~, err]   = step(crcDetect, codeword);

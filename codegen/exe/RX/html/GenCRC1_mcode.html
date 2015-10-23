@@ -1,0 +1,16 @@
+<pre class="code">
+<span class="srcline"><span class="lineno"><a href="1,1" id="srcline1"> 1</a></span><span class="line"><span class="keyword">function</span> <span class="var type1" id="S2T107U3">output</span> = <span class="message error" id="M1F1C">GenCRC</span>()</span></span>
+<span class="srcline"><span class="lineno"><a href="1,2" id="srcline2"> 2</a></span><span class="line"></span></span>
+<span class="srcline"><span class="lineno"><a href="1,3" id="srcline3"> 3</a></span><span class="line"><span class="keyword">persistent</span> <span class="var type1" id="S3T218U7">crcGen</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,4" id="srcline4"> 4</a></span><span class="line"></span></span>
+<span class="srcline"><span class="lineno"><a href="1,5" id="srcline5"> 5</a></span><span class="line"><span class="keyword">if</span> <span class="mxinfo " id="T1:U3"><span class="mxinfo " id="T1:U4">isempty(<span class="var type0" id="S3T0U12">crcGen</span>)</span></span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,6" id="srcline6"> 6</a></span><span class="line">    <span class="comment">% Encode the message words using a CRC generator</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,7" id="srcline7"> 7</a></span><span class="line">    <span class="mxinfo " id="T218:U5"><span class="var type1" id="S3T218U15">crcGen</span>      = comm.CRCGenerator([1 0 0 1], <span class="string">'ChecksumsPerFrame'</span>,2)</span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,8" id="srcline8"> 8</a></span><span class="line"><span class="keyword">end</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,9" id="srcline9"> 9</a></span><span class="line"></span></span>
+<span class="srcline"><span class="lineno"><a href="1,10" id="srcline10">10</a></span><span class="line"><span class="mxinfo " id="T37:U7"><span class="var type1" id="S6T37U30">x</span> = logical(<span class="mxinfo " id="T37:U9">[1 0 1 1 0 1 0 1 1 1 0 1]'</span>)</span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,11" id="srcline11">11</a></span><span class="line"><span class="mxinfo " id="T107:U10"><span class="var type1" id="S2T107U50">output</span> = <span class="mxinfo " id="T107:U12">step(<span class="var type1" id="S3T218U53">crcGen</span>, <span class="var type1" id="S6T37U54">x</span>)</span></span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,12" id="srcline12">12</a></span><span class="line"></span></span>
+<span class="srcline"><span class="lineno"><a href="1,13" id="srcline13">13</a></span><span class="line"></span></span>
+<span class="srcline"><span class="lineno"><a href="1,14" id="srcline14">14</a></span><span class="line"><span class="keyword">end</span></span></span>
+</pre>
