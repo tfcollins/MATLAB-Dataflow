@@ -69,7 +69,7 @@ int main()
 
     //// Run Graph ////
     cout<<"MAIN>> Type: 'top -H -p `pidof RX`' in a terminal to view thread utilization\n";
-    double SimDuration = 60;// set SimDuration<=0 for continuous run
+    double SimDuration = 10;// set SimDuration<=0 for continuous run
     cout<<"Starting up (purposely delayed)\n";
     TestGraph.run(SimDuration);// Turn blocks on
     cout<<"Test complete\n";

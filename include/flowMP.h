@@ -102,6 +102,23 @@ public:
     ~Worker()
     {
         m_StopThread = true;
+	std::cout<<"Deconstructor Called\n";
+	for(int port=0; port<m_InputConds.size(); port++)
+	{
+		(*(m_InputConds[port])).notify_all();
+		(*(m_InputMutexs[port])).unlock();
+		try
+		{
+			(*(m_OutputMutexs[port])).unlock();
+		}
+		catch (...)
+		{
+			std::cout<<"Could not unlock mutex\n";
+		}
+		//m_Input[port].reset();
+		//m_OutputConds[port].reset();
+	}
+	std::cout<<"Deconstructor Finished\n";
     }
 
 // Data management functions
@@ -196,7 +213,7 @@ void block()
     m_FunctionCleanup();
 
     // Notify when thread completes
-    std::cout << "Thread Done: " << boost::this_thread::get_id() << '\n';
+    std::cout << "Thread Done: " << m_BlockName << " ID: " << boost::this_thread::get_id() << '\n';
 
 }
 
@@ -228,11 +245,13 @@ void block_source()
             addToOutputQueues(processedData);
 
     }
+    std::cout<<"Source block finished\n";
+
     // Cleanup after threaded function
     m_FunctionCleanup();
 
     // Notify when thread completes
-    std::cout << "Thread Done: " << boost::this_thread::get_id() << '\n';
+    std::cout << "Thread Done: " << m_BlockName << " ID: " << boost::this_thread::get_id() << '\n';
 
 }
 // Sink Block
@@ -257,12 +276,13 @@ void block_sink()
         //Process Data
         processedData = m_ProcessData(data,&flag);
     }
+    std::cout<<"Sink block finished\n";
 
     // Cleanup after threaded function
     m_FunctionCleanup();
 
     // Notify when thread completes
-    std::cout << "Thread Done: " << boost::this_thread::get_id() << '\n';
+    std::cout << "Thread Done: " << m_BlockName << " ID: " << boost::this_thread::get_id() << '\n';
 
 }
 // Spawn threads for given block type

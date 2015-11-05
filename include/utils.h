@@ -46,7 +46,7 @@ template<typename U>
 void Shutdown(U block)
 {
     (*block).m_StopThread = true;
-		int usec = 100;
+    int usec = 100;
     boost::this_thread::sleep(boost::posix_time::microseconds(usec));
     (*block).m_BlockThread.join();
 }
@@ -56,7 +56,7 @@ void Shutdown(U block, Args ...args)
 {
     (*block).m_StopThread = true;
     (*block).m_BlockThread.join();
-		int usec = 100;
+    int usec = 100;
     boost::this_thread::sleep(boost::posix_time::microseconds(usec));
     Shutdown( args... );
 }
@@ -77,11 +77,17 @@ void SimDuration(double duration)
 {
     std::cout<<"INFO>> Running simulation for "<<duration<<" seconds\n";
     std::cout<<"INFO>> Main thread sleeping\n";
+/*
     for(int j=0;j<duration;j++)
 		{
 			int usec = ONESECOND;
 			boost::this_thread::sleep(boost::posix_time::microseconds(usec));
 		}
+*/
+	int usec = ONESECOND*duration;
+	boost::this_thread::sleep(boost::posix_time::microseconds(usec));
+		
+
     std::cout<<"INFO>> Main thread done sleeping\n";
 }
 

@@ -31,7 +31,7 @@ void run(double duration)
             }
 
     // Setup in and out blocks
-    for (int b=0;b<Blocks.size();b++)
+    for (int b=0;b<(int)Blocks.size();b++)
         for (int n=0;n<Sinks.size();n++)
             if ((((*Blocks[b]).m_BlockName).compare(Sinks[n])!=0)&&
                (((*Blocks[b]).m_BlockName).compare(Sources[n])!=0))
@@ -41,7 +41,7 @@ void run(double duration)
             }
 
     // Setup Source(s)
-    for (int b=0;b<Blocks.size();b++)
+    for (int b=0;b<(int)Blocks.size();b++)
         for (int n=0;n<Sinks.size();n++)
             if (((*Blocks[b]).m_BlockName).compare(Sources[n])==0)
             {
@@ -77,17 +77,26 @@ void shutdown()
     std::cout<<"INFO>> ------SHUTTING DOWN------\n";
     std::cout<<"INFO>> Waiting for threads to quit\n";
     std::cout<<"INFO>> Ignore errors that may follow\n";
-    for (int b;b<Blocks.size();b++)
+    std::cout<<"Blocks to shutdown "<<Blocks.size()<<std::endl;
+    for (int b=0;b<Blocks.size();b++)
     {
+	std::cout<<"Pre try\n";
         try
         {
+	    std::cout<<"Stoping thread\n";
             (*Blocks[b]).m_StopThread = true;
+	    std::cout<<"Stop flag set\n";
             (*Blocks[b]).m_BlockThread.join();
-            int usec = 100;
+            int usec = 1000;
             boost::this_thread::sleep(boost::posix_time::microseconds(usec));
         }
         catch (...)
-        {}
+        {
+		std::cout<<"Exception on block: "<<b<<std::endl;
+	}
     }
+    int usec = 4000000;
+    boost::this_thread::sleep(boost::posix_time::microseconds(usec));
+    std::cout<<"Block stopping complete\n";
 }
 };
