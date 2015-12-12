@@ -9,7 +9,7 @@ add_executable(TestFlow src/testFlowMP.cpp)
 
 # Find dependencies
 #find_package(Boost COMPONENTS thread system REQUIRED)
-find_package(Boost 1.55.0 REQUIRED COMPONENTS system filesystem thread)
+find_package(Boost 1.54.0 REQUIRED COMPONENTS system filesystem thread)
 target_link_libraries(TestFlow
   ${Boost_THREAD_LIBRARY}
   ${Boost_FILESYSTEM_LIBRARY}
@@ -20,5 +20,5 @@ target_link_libraries(TestFlow
 #    message(${Boost_INCLUDE_DIRS})
 #endif()
 
-set(CMAKE_CXX_FLAGS "-std=c++11 -g -Wall -lboost_thread -lboost_system")
+set(CMAKE_CXX_FLAGS "-std=c++11 -g -Wall -lboost_thread -lboost_system -pthread")
 

@@ -101,24 +101,19 @@ public:
     //Destructor
     ~Worker()
     {
-        m_StopThread = true;
-	std::cout<<"Deconstructor Called\n";
-	for(int port=0; port<m_InputConds.size(); port++)
-	{
-		(*(m_InputConds[port])).notify_all();
-		(*(m_InputMutexs[port])).unlock();
-		try
-		{
-			(*(m_OutputMutexs[port])).unlock();
-		}
-		catch (...)
-		{
-			std::cout<<"Could not unlock mutex\n";
-		}
-		//m_Input[port].reset();
-		//m_OutputConds[port].reset();
-	}
-	std::cout<<"Deconstructor Finished\n";
+      for(int port=0; port<m_InputConds.size(); port++)
+      {
+        //(*(m_InputConds[port])).notify_all();
+        //(*(m_InputMutexs[port])).unlock();
+        //(m_InputMutexs[port]).reset();
+      }
+
+      for(int port=0; port<m_OutputConds.size(); port++)
+      {
+        m_OutputConds[port].reset();
+        //(*(m_OutputMutexs[port])).unlock();
+        (m_OutputMutexs[port]).reset(); //SEG FAULTING HERE
+      }
     }
 
 // Data management functions
@@ -133,6 +128,9 @@ voidvec readFromInputQueues()
     for(int inport=0; inport < m_NumInputs ; inport++)
     {
         inputs[inport] = readFromInputQueue(inport);
+        // Stop thread
+        if (m_StopThread)
+          break;
     }
 
     return inputs;
@@ -145,15 +143,26 @@ void* readFromInputQueue(int inport)
     // Wait for data
     if (*(m_InputQueueSizes[inport]) == 0){
         // Wait for signal
-        boost::unique_lock<boost::mutex> lock(*(m_InputMutexs[inport]));
+        //boost::unique_lock<boost::mutex> lock(*(m_InputMutexs[inport]));
+        boost::mutex::scoped_lock lock(*(m_InputMutexs[inport]));
+
         do {(*(m_InputConds[inport])).wait(lock);}//Wait will tell the lock to unlock
-        while (*(m_InputQueueSizes[inport]) == 0);//If we wake up, make sure we have data to work with
+        while ((*(m_InputQueueSizes[inport]) == 0) && (!m_StopThread));//If we wake up, make sure we have data to work with
     }
     else if ((*(m_InputQueueSizes[inport]))>WARNINGQSIZE)
         std::cout<<"Input Queue Size: "<<(*(m_InputQueueSizes[inport]))<<" | "<< m_BlockName << std::endl;
 
+    // Thread stopped
+    if (m_StopThread)
+    {
+      void* empty;
+      return empty;
+    }
+
     // When data is ready read it off queue
-    boost::lock_guard<boost::mutex> lock(*(m_InputMutexs[inport]));
+    //boost::lock_guard<boost::mutex> lock(*(m_InputMutexs[inport]));
+    boost::mutex::scoped_lock lock(*(m_InputMutexs[inport]));
+
     void* data = (*(m_InputQueues[inport])).front();
     (*(m_InputQueues[inport])).pop();
 
@@ -186,6 +195,14 @@ void addToOutputQueue(void* processedData, int outport)
 
 }
 
+// Notify all connected blocks (this being a source to them)
+void notifyConnectedBlocks()
+{
+    // Cycle over ports
+    for(int outport=0; outport < m_NumOutputs ; outport++)
+        (*(m_OutputConds[outport])).notify_one();
+}
+
 // In and Out Process Block
 void block()
 {
@@ -203,6 +220,9 @@ void block()
     {
         //Read Data
         data = readFromInputQueues();
+        if (m_StopThread)
+          break;
+
         //Process Data
         processedData = m_ProcessData(data,&flag);
         //Output Data
@@ -239,6 +259,8 @@ void block_source()
     {
         //Process Data
         processedData = m_ProcessData(data, &flag);
+        if (m_StopThread)
+          break;
 
         //Output Data
         if (flag>0)
@@ -272,6 +294,8 @@ void block_sink()
     {
         //Read Data
         data = readFromInputQueues();
+        if (m_StopThread)
+          break;
 
         //Process Data
         processedData = m_ProcessData(data,&flag);
