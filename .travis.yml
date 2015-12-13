@@ -28,4 +28,4 @@ install:
 
 # run test
 script:
- - mkdir build && cd build && cmake .. && make && TestFlow
+ - mkdir build && cd build && cmake .. && make && ./TestFlow
