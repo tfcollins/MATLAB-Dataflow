@@ -42,6 +42,10 @@ public:
     std::function<void()> m_FunctionInit;
     std::function<void()> m_FunctionCleanup;
 
+    // User defined parameters
+    int m_NumInputs;
+    int m_NumOutputs;
+
     // Constructor
     Worker(std::function<voidvec(voidvec,int*)> ProcessData,
             int numInputs, int numOutputs,
@@ -85,8 +89,6 @@ public:
     // Parameters
     std::atomic<bool>                              m_StopThread;
     boost::thread                                  m_BlockThread;
-    int m_NumInputs;
-    int m_NumOutputs;
     // MIMO Parameters
     std::vector<boost::shared_ptr<std::atomic<int>>>            m_InputQueueSizes;
     std::vector<boost::shared_ptr<std::atomic<int>>>            m_OutputQueueSizes;
@@ -101,14 +103,14 @@ public:
     //Destructor
     ~Worker()
     {
-      for(int port=0; port<m_InputConds.size(); port++)
+      for(uint port=0; port<m_InputConds.size(); port++)
       {
         //(*(m_InputConds[port])).notify_all();
         //(*(m_InputMutexs[port])).unlock();
         //(m_InputMutexs[port]).reset();
       }
 
-      for(int port=0; port<m_OutputConds.size(); port++)
+      for(uint port=0; port<m_OutputConds.size(); port++)
       {
         m_OutputConds[port].reset();
         //(*(m_OutputMutexs[port])).unlock();

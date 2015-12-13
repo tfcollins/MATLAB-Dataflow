@@ -5,7 +5,7 @@ project (MATLAB-Dataflow)
 include_directories(include)
 
 # Source
-add_executable(TestFlow src/testFlowMP.cpp)
+add_executable(TestFlow test/testFlowMP.cpp)
 
 # Find dependencies
 #find_package(Boost COMPONENTS thread system REQUIRED)
