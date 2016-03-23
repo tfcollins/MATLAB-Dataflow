@@ -64,7 +64,7 @@ void run(double duration)
 
     // Stop Timers
     final=clock()-init;
-    std::cout << "INFO>> Test duration: " << (double)final / ((double)CLOCKS_PER_SEC) << " Seconds" << std::endl;
+    // std::cout << "INFO>> Test duration: " << (double)final / ((double)CLOCKS_PER_SEC) << " Seconds" << std::endl;
 
     // Shutdown
     shutdown();
@@ -74,10 +74,10 @@ void run(double duration)
 // Stop graph
 void shutdown()
 {
-    std::cout<<"INFO>> ------SHUTTING DOWN------\n";
-    std::cout<<"INFO>> Waiting for threads to quit\n";
-    std::cout<<"INFO>> Ignore errors that may follow\n";
-    std::cout<<"Blocks to shutdown: "<<Blocks.size()<<std::endl;
+    // std::cout<<"INFO>> ------SHUTTING DOWN------\n";
+    // std::cout<<"INFO>> Waiting for threads to quit\n";
+    // std::cout<<"INFO>> Ignore errors that may follow\n";
+    // std::cout<<"Blocks to shutdown: "<<Blocks.size()<<std::endl;
   //   for (int b=0;b<Blocks.size();b++)
   //   {
 	//      std::cout<<"Pre try\n";
@@ -114,6 +114,6 @@ void shutdown()
 
     int usec = 4000000;
     boost::this_thread::sleep(boost::posix_time::microseconds(usec));
-    std::cout<<"Block stopping complete\n";
+    // std::cout<<"Block stopping complete\n";
 }
 };

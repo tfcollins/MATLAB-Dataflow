@@ -151,8 +151,8 @@ void* readFromInputQueue(int inport)
         do {(*(m_InputConds[inport])).wait(lock);}//Wait will tell the lock to unlock
         while ((*(m_InputQueueSizes[inport]) == 0) && (!m_StopThread));//If we wake up, make sure we have data to work with
     }
-    else if ((*(m_InputQueueSizes[inport]))>WARNINGQSIZE)
-        std::cout<<"Input Queue Size: "<<(*(m_InputQueueSizes[inport]))<<" | "<< m_BlockName << std::endl;
+    // else if ((*(m_InputQueueSizes[inport]))>WARNINGQSIZE)
+    //     std::cout<<"Input Queue Size: "<<(*(m_InputQueueSizes[inport]))<<" | "<< m_BlockName << std::endl;
 
     // Thread stopped
     if (m_StopThread)
@@ -235,7 +235,7 @@ void block()
     m_FunctionCleanup();
 
     // Notify when thread completes
-    std::cout << "Thread Done: " << m_BlockName << " ID: " << boost::this_thread::get_id() << '\n';
+    // std::cout << "Thread Done: " << m_BlockName << " ID: " << boost::this_thread::get_id() << '\n';
 
 }
 
@@ -275,7 +275,7 @@ void block_source()
     m_FunctionCleanup();
 
     // Notify when thread completes
-    std::cout << "Thread Done: " << m_BlockName << " ID: " << boost::this_thread::get_id() << '\n';
+    // std::cout << "Thread Done: " << m_BlockName << " ID: " << boost::this_thread::get_id() << '\n';
 
 }
 // Sink Block
@@ -302,13 +302,13 @@ void block_sink()
         //Process Data
         processedData = m_ProcessData(data,&flag);
     }
-    std::cout<<"Sink block finished\n";
+    // std::cout<<"Sink block finished\n";
 
     // Cleanup after threaded function
     m_FunctionCleanup();
 
     // Notify when thread completes
-    std::cout << "Thread Done: " << m_BlockName << " ID: " << boost::this_thread::get_id() << '\n';
+    // std::cout << "Thread Done: " << m_BlockName << " ID: " << boost::this_thread::get_id() << '\n';
 
 }
 // Spawn threads for given block type

@@ -38,7 +38,7 @@ int main()
     connect(block1, 0, block2, 0);
 
     //// Create graph and add blocks ////
-    Graph Receiver("WLAN RX");
+    Graph Receiver("CRC Test Example");
     Receiver.Blocks = {&block1,&block2};
 
     // Label Sources and Sinks (Strings from block thread names)
@@ -49,7 +49,7 @@ int main()
     cout<<"MAIN>> Type: 'top -H -p `pidof RX`' in a terminal to view thread utilization\n";
     double SimDuration = 60;// set SimDuration<=0 for continuous run
     cout<<"Starting up (purposely delayed)\n";
-    Receiver.run(SimDuration);// Turn blocks on     
+    Receiver.run(SimDuration);// Turn blocks on
 
 
     return 0;

@@ -63,9 +63,9 @@ void Shutdown(U block, Args ...args)
 template<typename ...Args>
 void StopSim(Args ...args)
 {
-    std::cout<<"INFO>> ------SHUTTING DOWN------\n";
-    std::cout<<"INFO>> Waiting for threads to quit\n";
-    std::cout<<"INFO>> Ignore errors that may follow\n";
+    // std::cout<<"INFO>> ------SHUTTING DOWN------\n";
+    // std::cout<<"INFO>> Waiting for threads to quit\n";
+    // std::cout<<"INFO>> Ignore errors that may follow\n";
 
     try
         {Shutdown(args...);}
@@ -75,8 +75,8 @@ void StopSim(Args ...args)
 // Simulation sleep
 void SimDuration(double duration)
 {
-    std::cout<<"INFO>> Running simulation for "<<duration<<" seconds\n";
-    std::cout<<"INFO>> Main thread sleeping\n";
+    // std::cout<<"INFO>> Running simulation for "<<duration<<" seconds\n";
+    // std::cout<<"INFO>> Main thread sleeping\n";
 /*
     for(int j=0;j<duration;j++)
 		{
@@ -86,9 +86,9 @@ void SimDuration(double duration)
 */
 	int usec = ONESECOND*duration;
 	boost::this_thread::sleep(boost::posix_time::microseconds(usec));
-		
 
-    std::cout<<"INFO>> Main thread done sleeping\n";
+
+    // std::cout<<"INFO>> Main thread done sleeping\n";
 }
 
 // [EOF]

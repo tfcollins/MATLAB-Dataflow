@@ -11,13 +11,13 @@
 OUTPUTS CRCSource(INPUTS input, int *flag)
 {
     usleep(1000);// Slow this down so we don't max out the core
-    
+
     // Setup output
     boolean_T *bits = new boolean_T[NUMSAMPLES];
-    
+
     // Process
     GenCRC(bits);
-            
+
     //Enable pass to next block
     *flag = 1;
     return SendOut(bits);
@@ -27,15 +27,15 @@ OUTPUTS CRCSink(INPUTS input, int *flag)
 {
     // Get input
     boolean_T *bits = (boolean_T*) input[0];
-    
+
     // Process
     CheckCRC(bits);
-            
+
     //Cleanup
     delete bits;
 
     //Disable pass to next block
-    //*flag = 0;
+    //*flag = 0; // For sink blocks flag has no effect
     return SendOut(none);//none is a special variable for sinks
 }
 // [EOF]
