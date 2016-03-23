@@ -70,7 +70,7 @@ int main()
                 Benchmark.Sinks = {"Consumer"};
 
                 //// Run Graph ////
-                double SimDuration = 40; // set SimDuration<=0 for continuous run
+                double SimDuration = 20; // set SimDuration<=0 for continuous run
                 cout<<"Starting up (purposely delayed)\n";
                 Benchmark.run(SimDuration); // Turn blocks on (blocking)
 
@@ -83,6 +83,10 @@ int main()
         double sum = std::accumulate(runTimes.begin(), runTimes.end(), 0.0);
         double mean = sum / runTimes.size();
         std::cout<<"Mean Time: "<<mean<<std::endl;
+
+	double sq_sum = std::inner_product(runTimes.begin(), runTimes.end(), runTimes.begin(), 0.0);
+	double stddev = std::sqrt(sq_sum / runTimes.size() - mean * mean);
+        std::cout<<"STDDev: "<<stddev<<std::endl;
 
         return 0;
 }
