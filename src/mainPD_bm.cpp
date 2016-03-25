@@ -5,24 +5,14 @@
 #include "flowMP.h"
 #include "utils.h"
 #include "graph.h"
-
 #ifdef _WIN32 // Windows still not fully working (boost problems)
     #include <Windows.h>
 #endif
 
-extern boost::timer::cpu_times times;
-extern long counter;
-
-// // Block header files
-// #include "CheckCRC.h"
-// #include "GenCRC.h"
-
-// // Library header files
-// #include "RX_terminate.h"
-// #include "RX_initialize.h"
-
 // Block definitions
 #include "blocks_bm.h"
+extern boost::timer::cpu_times times;
+extern long counter;
 
 using namespace std;
 
@@ -33,15 +23,10 @@ double Eval_Time()
     // Calculate time to do one pass
     boost::timer::nanosecond_type elapsed(times.wall);
 
-    // double nanoSecondsPerSecond = 1000000000;
-    // std::cout << "Function Pass Delay: " << (((double)elapsed)/((double)maxCount*nanoSecondsPerSecond)) << std::endl;
-
     double nanoSecondsPerHandover = (((double)elapsed)/((double)maxCount));
-
     std::cout << "Function Pass Delay: " << nanoSecondsPerHandover << std::endl;
 
     return nanoSecondsPerHandover;
-
 }
 
 

@@ -1,22 +1,15 @@
 // Utilities
 
-//Defines
-#define ONESECOND 1000000
+#ifndef UTILS_H
+#define UTILS_H
 
 // Blank data, used for sink return calls
 void* none;
 
-// Connect blocks together
-void connect(Worker &aBlock, int outport, Worker &bBlock, int inport)
+template<class T>
+void* consumeOut(T in)
 {
-	// Map mutexes
-	bBlock.m_InputMutexs[inport] = aBlock.m_OutputMutexs[outport];
-	// Map conditionals
-	bBlock.m_InputConds[inport] = aBlock.m_OutputConds[outport];
-	// Map queues
-	bBlock.m_InputQueues[inport] = aBlock.m_OutputQueues[outport];
-	// Map atomics
-	bBlock.m_InputQueueSizes[inport] = aBlock.m_OutputQueueSizes[outport];
+        return (void*) in;
 }
 
 // Consume Outputs to create void* output vector
@@ -72,23 +65,7 @@ void StopSim(Args ...args)
     catch(...)
     {}
 }
-// Simulation sleep
-void SimDuration(double duration)
-{
-    // std::cout<<"INFO>> Running simulation for "<<duration<<" seconds\n";
-    // std::cout<<"INFO>> Main thread sleeping\n";
-/*
-    for(int j=0;j<duration;j++)
-		{
-			int usec = ONESECOND;
-			boost::this_thread::sleep(boost::posix_time::microseconds(usec));
-		}
-*/
-	int usec = ONESECOND*duration;
-	boost::this_thread::sleep(boost::posix_time::microseconds(usec));
 
 
-    // std::cout<<"INFO>> Main thread done sleeping\n";
-}
-
+#endif
 // [EOF]

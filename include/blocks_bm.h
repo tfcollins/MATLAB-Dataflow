@@ -2,7 +2,6 @@
 // MATLAB Datatype support functions (May not always be included with generated code, if not they are not required here)
 //#include "RX_emxutil.h"
 
-
 // Defines
 #define NUMSAMPLES 18
 
