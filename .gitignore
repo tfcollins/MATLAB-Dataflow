@@ -212,7 +212,10 @@ _Pvt_Extensions/
 ModelManifest.xml
 
 # Travis
+*.m~
 build/
 codegen/
 ._.DS_Store
 .DS_Store
+functionsToThread.mat
+RX

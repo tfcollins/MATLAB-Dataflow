@@ -16,7 +16,7 @@
 #include "RX_initialize.h"
 
 // Block definitions
-#include "blocks.h"
+#include "blocks_gen.h"
 
 using namespace std;
 
@@ -31,8 +31,8 @@ int main()
     // Termination_function: Function name produced by MATLAB coder to be called after function is never to be called again
     // Thread_Name: String that will help monitor different threads is programs like 'top'
 
-    Worker block1(CRCSource, 0, 1, RX_initialize, RX_terminate, "CRC Source");
-    Worker block2(CRCSink,   1, 0, RX_initialize, RX_terminate, "CRC Sink");
+    Worker block1(GenCRCBLK, 0, 1, RX_initialize, RX_terminate, "CRC Source");
+    Worker block2(CheckCRCBLK,   1, 0, RX_initialize, RX_terminate, "CRC Sink");
 
     //// Connect blocks together (Port numbers start with 0) ////
     connect(block1, 0, block2, 0);
