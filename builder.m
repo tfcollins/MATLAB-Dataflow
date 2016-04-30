@@ -5,7 +5,7 @@ addpath(genpath('mfiles'));
 % Coder config setup
 cfg = coder.config('exe');
 cfg.CustomSource = 'mainPD.cpp';
-cfg.CodeExecutionProfiling = true;
+%cfg.CodeExecutionProfiling = true;
 cfg.GenerateCodeReplacementReport = true;
 if ispc % Windows
     cfg.CustomLibrary = 'C:\Boost\lib\';
@@ -34,17 +34,17 @@ if enableDebugging
         functionsToThread{:},...
         additionalSourceFiles{:},...
         '-o',outputFunctionName{:},...
-        '-v','-g');    
+        '-v','-g');
 else
     codegen('-config','cfg',...
         functionsToThread{:},...
         additionalSourceFiles{:},...
         '-o',outputFunctionName{:},...
-        '-v');    
+        '-v');
 end
 
 % % Run Code
 % !./RX
-% 
+%
 % % Run C++ profiler and graph maker
 % !gprof RX | gprof2dot | dot -Tpng -o output.png

@@ -214,3 +214,5 @@ ModelManifest.xml
 # Travis
 build/
 codegen/
+._.DS_Store
+.DS_Store
