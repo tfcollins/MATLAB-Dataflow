@@ -6,6 +6,7 @@ import CppHeaderParser
 # Automatic code generate block files
 # 1. Get input and output variable names from .m code
 # 2. Get C++ names from headers
+# 3. Write blocks headers
 
 hroot = 'codegen/exe/RX/'
 mroot = 'mfiles/'
@@ -181,7 +182,7 @@ def ProcessFunctions(functions):
     # Form header
     separator = '\n/////////////////////////////////////////////////\n'
     BlocksHeader = separator.join(BC)
-    header = '// MATLAB Datatype support functions (May not always be included with generated code, if not they are not required here)\n//#include "RX_emxutil.h"\n'
+    header = '// Auto-Generated Header\n// MATLAB Datatype support functions (May not always be included with generated code, if not they are not required here)\n//#include "RX_emxutil.h"\n'
     footer = '//[EOF]'
     BlocksHeader = header + separator + BlocksHeader + footer
     return BlocksHeader

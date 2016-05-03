@@ -219,3 +219,5 @@ codegen/
 .DS_Store
 functionsToThread.mat
 RX
+._*
+*.mexmaci64

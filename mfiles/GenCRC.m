@@ -4,7 +4,7 @@ persistent crcGen
 
 if isempty(crcGen)
     % Encode the message words using a CRC generator
-    crcGen      = comm.CRCGenerator([1 0 0 1], 'ChecksumsPerFrame',2);
+    crcGen = comm.CRCGenerator([1 0 0 1], 'ChecksumsPerFrame',2);
 end
 
 x = logical([1 0 1 1 0 1 0 1 1 1 0 1]');
