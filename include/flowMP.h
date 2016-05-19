@@ -14,6 +14,8 @@
 #include <boost/scoped_ptr.hpp>
 #include <vector>
 #include <time.h>
+#include "readerwriterqueue.h"
+#include "atomicops.h"
 #ifdef UNIX
   #include <sys/prctl.h> //Needed for thread naming
 #endif
@@ -61,8 +63,8 @@ public:
         std::vector<boost::shared_ptr<boost::mutex> >                m_OutputMutexs;
         std::vector<boost::shared_ptr<boost::condition_variable> >   m_InputConds;
         std::vector<boost::shared_ptr<boost::condition_variable> >   m_OutputConds;
-        std::vector<boost::shared_ptr<std::queue<void*> > >           m_InputQueues;
-        std::vector<boost::shared_ptr<std::queue<void*> > >           m_OutputQueues;
+        std::vector<boost::shared_ptr<moodycamel::BlockingReaderWriterQueue<void*> > >           m_InputQueues;
+        std::vector<boost::shared_ptr<moodycamel::BlockingReaderWriterQueue<void*> > >           m_OutputQueues;
         std::string m_BlockName;
         // Data management functions
         // INPUTS

@@ -27,24 +27,26 @@ Worker::Worker(std::function<voidvec(voidvec,int*)> ProcessData,
         //Setup Ports
         for(int port=0; port<numInputs; port++)
         {
-                boost::shared_ptr<std::atomic<int> > sptr (new std::atomic<int>(0));
-                m_InputQueueSizes.push_back(sptr);
-                boost::shared_ptr<boost::mutex> sptr2 (new boost::mutex);
-                m_InputMutexs.push_back(sptr2);
+                // boost::shared_ptr<std::atomic<int> > sptr (new std::atomic<int>(0));
+                // m_InputQueueSizes.push_back(sptr);
+                // boost::shared_ptr<boost::mutex> sptr2 (new boost::mutex);
+                // m_InputMutexs.push_back(sptr2);
                 boost::shared_ptr<boost::condition_variable> sptr3 (new boost::condition_variable);
                 m_InputConds.push_back(sptr3);
-                boost::shared_ptr<std::queue<void*> > sptr4 (new std::queue<void*>);
+                // boost::shared_ptr<std::queue<void*> > sptr4 (new std::queue<void*>);
+                boost::shared_ptr<moodycamel::BlockingReaderWriterQueue<void*>> sptr4 (new moodycamel::BlockingReaderWriterQueue<void*>);
                 m_InputQueues.push_back(sptr4);
         }
         for(int port=0; port<numOutputs; port++)
         {
-                boost::shared_ptr<std::atomic<int> > sptr (new std::atomic<int>(0));
-                m_OutputQueueSizes.push_back(sptr);
-                boost::shared_ptr<boost::mutex> sptr2 (new boost::mutex);
-                m_OutputMutexs.push_back(sptr2);
+                // boost::shared_ptr<std::atomic<int> > sptr (new std::atomic<int>(0));
+                // m_OutputQueueSizes.push_back(sptr);
+                // boost::shared_ptr<boost::mutex> sptr2 (new boost::mutex);
+                // m_OutputMutexs.push_back(sptr2);
                 boost::shared_ptr<boost::condition_variable> sptr3 (new boost::condition_variable);
                 m_OutputConds.push_back(sptr3);
-                boost::shared_ptr<std::queue<void*> > sptr4 (new std::queue<void*>);
+                // boost::shared_ptr<std::queue<void*> > sptr4 (new std::queue<void*>);
+                boost::shared_ptr<moodycamel::BlockingReaderWriterQueue<void*>> sptr4 (new moodycamel::BlockingReaderWriterQueue<void*>);
                 m_OutputQueues.push_back(sptr4);
         }
 
@@ -70,35 +72,15 @@ voidvec Worker::readFromInputQueues()
 // Get data from queue
 void* Worker::readFromInputQueue(int inport)
 {
-
-        // Wait for data
-        if (*(m_InputQueueSizes[inport]) == 0) {
-                // Wait for signal
-                //boost::unique_lock<boost::mutex> lock(*(m_InputMutexs[inport]));
-                boost::mutex::scoped_lock lock(*(m_InputMutexs[inport]));
-
-                do {(*(m_InputConds[inport])).wait(lock); } //Wait will tell the lock to unlock
-                while ((*(m_InputQueueSizes[inport]) == 0) && (!m_StopThread)); //If we wake up, make sure we have data to work with
-        }
-        // else if ((*(m_InputQueueSizes[inport]))>WARNINGQSIZE)
-        //     std::cout<<"Input Queue Size: "<<(*(m_InputQueueSizes[inport]))<<" | "<< m_BlockName << std::endl;
-
         // Thread stopped
         if (m_StopThread)
         {
                 void* empty;
                 return empty;
         }
-
-        // When data is ready read it off queue
-        //boost::lock_guard<boost::mutex> lock(*(m_InputMutexs[inport]));
-        boost::mutex::scoped_lock lock(*(m_InputMutexs[inport]));
-
-        void* data = (*(m_InputQueues[inport])).front();
-        (*(m_InputQueues[inport])).pop();
-
-        // Update queue size atomic
-        (*(m_InputQueueSizes[inport]))--;
+        // Get New Data
+        void *data;
+        (*(m_InputQueues[inport])).wait_dequeue(data);
 
         return data;
 }
@@ -117,13 +99,7 @@ void Worker::addToOutputQueues(voidvec ProcessedDataVector)
 void Worker::addToOutputQueue(void* processedData, int outport)
 {
         // Add data to queue
-        boost::lock_guard<boost::mutex> lock(*(m_OutputMutexs[outport]));
-        (*(m_OutputQueues[outport])).push(processedData);
-        (*(m_OutputQueueSizes[outport]))++;
-
-        // Notify next block
-        (*(m_OutputConds[outport])).notify_one();
-
+        (*(m_OutputQueues[outport])).enqueue(processedData);
 }
 
 // Notify all connected blocks (this being a source to them)
@@ -257,12 +233,12 @@ void Worker::run_sink()
 // Connect blocks together
 void connect(Worker &aBlock, int outport, Worker &bBlock, int inport)
 {
-	// Map mutexes
-	bBlock.m_InputMutexs[inport] = aBlock.m_OutputMutexs[outport];
-	// Map conditionals
-	bBlock.m_InputConds[inport] = aBlock.m_OutputConds[outport];
+	// // Map mutexes
+	// bBlock.m_InputMutexs[inport] = aBlock.m_OutputMutexs[outport];
+	// // Map conditionals
+	// bBlock.m_InputConds[inport] = aBlock.m_OutputConds[outport];
+  // // Map atomics
+	// bBlock.m_InputQueueSizes[inport] = aBlock.m_OutputQueueSizes[outport];
 	// Map queues
 	bBlock.m_InputQueues[inport] = aBlock.m_OutputQueues[outport];
-	// Map atomics
-	bBlock.m_InputQueueSizes[inport] = aBlock.m_OutputQueueSizes[outport];
 }
