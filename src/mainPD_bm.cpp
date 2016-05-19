@@ -8,6 +8,8 @@
 #ifdef _WIN32 // Windows still not fully working (boost problems)
     #include <Windows.h>
 #endif
+#include <functional>
+#include <numeric>
 
 // Block definitions
 #include "blocks_bm.h"
