@@ -9,3 +9,6 @@ Required Packages/Software
  - cmake (For testing only)
  - CppHeaderParser `sudo pip install CppHeaderParser`
  - MATLAB R2014a+ (Have not tested with previous versions)
+
+ Acknowledgements  
+ - Thanks to Cameron Desrochers nonblocking queue code `readerwriterqueue`  
