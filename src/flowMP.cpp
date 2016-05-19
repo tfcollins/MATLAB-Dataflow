@@ -72,17 +72,23 @@ voidvec Worker::readFromInputQueues()
 // Get data from queue
 void* Worker::readFromInputQueue(int inport)
 {
-        // Thread stopped
-        if (m_StopThread)
-        {
-                void* empty;
-                return empty;
-        }
-        // Get New Data
+        // Get New Data From Upstream Block
         void *data;
-        (*(m_InputQueues[inport])).wait_dequeue(data);
+        bool succeeded;
 
-        return data;
+        // Wait for new data
+        while (true)
+        {
+          // Wait for new data with timeout
+          succeeded = (*(m_InputQueues[inport])).wait_dequeue_timed(data,std::chrono::milliseconds(5));
+
+          if (succeeded)// If we have data return
+            { return data; }
+          else if (m_StopThread)// If we have a stop signal return nothing
+          { void* empty; return empty; }
+        }
+
+
 }
 
 /////////////////////////////////////////////////////
@@ -140,7 +146,7 @@ void Worker::block()
         m_FunctionCleanup();
 
         // Notify when thread completes
-        // std::cout << "Thread Done: " << m_BlockName << " ID: " << boost::this_thread::get_id() << '\n';
+        std::cout << "Thread Done: " << m_BlockName << " ID: " << boost::this_thread::get_id() << '\n';
 
 }
 
@@ -180,7 +186,7 @@ void Worker::block_source()
         m_FunctionCleanup();
 
         // Notify when thread completes
-        // std::cout << "Thread Done: " << m_BlockName << " ID: " << boost::this_thread::get_id() << '\n';
+        std::cout << "Thread Done: " << m_BlockName << " ID: " << boost::this_thread::get_id() << '\n';
 
 }
 // Sink Block
@@ -213,7 +219,7 @@ void Worker::block_sink()
         m_FunctionCleanup();
 
         // Notify when thread completes
-        // std::cout << "Thread Done: " << m_BlockName << " ID: " << boost::this_thread::get_id() << '\n';
+        std::cout << "Thread Done: " << m_BlockName << " ID: " << boost::this_thread::get_id() << '\n';
 
 }
 // Spawn threads for given block type
