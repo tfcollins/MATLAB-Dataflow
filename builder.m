@@ -1,18 +1,17 @@
-function result = builder
+function result = builder(f2t,ofn)
 % Function specific information
-global functionsToThread; % Only way to pass to post codegen functions
-functionsToThread = {'GenCRC','AddNoise','CheckCRC'};
+global functionsToThread outputFunctionName; % Only way to pass to post codegen functions
+functionsToThread = f2t;%{'GenCRC','AddNoise','CheckCRC'};
 additionalSourceFiles = {'flowMP.h'};
-outputFunctionName = {'RX'};
-save('functionsToThread.mat','functionsToThread');
+outputFunctionName = {ofn};%{'RX'};
 
 % Include mfiles
 addpath(genpath('mfiles'));
 
 % Coder config setup
 cfg = coder.config('exe');
-cfg.CustomSource = 'mainPD.cpp:flowMP.cpp:graph.cpp';
-cfg.GenerateCodeReplacementReport = true;
+cfg.CustomSource = ['mainPD_',ofn,'_gen.cpp:flowMP.cpp:graph.cpp'];
+%cfg.GenerateCodeReplacementReport = true;
 if ispc % Windows
     cfg.CustomLibrary = 'C:\Boost\lib\';
     cfg.CustomInclude = 'C:\Boost\include\boost-1_49\';

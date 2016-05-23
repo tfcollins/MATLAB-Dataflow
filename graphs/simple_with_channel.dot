@@ -1,0 +1,6 @@
+digraph MyGraph{
+    fillcolor=red;
+    rankdir=LR;
+    node[shape=box,style=filled,fillcolor="#FFFBD0",color=black];
+    GenCRC_0->CheckCRC_0;
+}

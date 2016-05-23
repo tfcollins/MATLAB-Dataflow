@@ -32,6 +32,9 @@ public:
         // Run graph
         void run(double duration);
 
+        // Monitor running graph
+        void SimDuration(double duration);
+
         // Stop graph
         void shutdown();
 };

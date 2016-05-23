@@ -7,8 +7,10 @@
 #define FLOWMP_H
 
 #include <iostream>
+#include <fstream>
 #include <queue>
 #include <boost/thread.hpp>
+#include <chrono>
 #include <atomic>
 #include <functional>
 #include <boost/scoped_ptr.hpp>
@@ -19,6 +21,9 @@
 #ifdef UNIX
   #include <sys/prctl.h> //Needed for thread naming
 #endif
+
+#define BENCHMARKING true
+#define TIMING_SAMPLES 1000000
 
 // #include "utils.h"
 
@@ -66,6 +71,16 @@ public:
         std::vector<boost::shared_ptr<moodycamel::BlockingReaderWriterQueue<void*> > >           m_InputQueues;
         std::vector<boost::shared_ptr<moodycamel::BlockingReaderWriterQueue<void*> > >           m_OutputQueues;
         std::string m_BlockName;
+
+        // Extra Benchmarking Parameters
+        bool m_BenchMarking;
+        int m_BenchMarkingCount;
+        std::atomic<bool> m_BenchMarkComplete;
+        std::chrono::high_resolution_clock::time_point m_BM_START;
+        std::chrono::high_resolution_clock::time_point m_BM_END;
+        std::vector<std::chrono::high_resolution_clock::time_point> m_BenchMarkingStarts;
+        std::vector<std::chrono::high_resolution_clock::time_point> m_BenchMarkingEnds;
+
         // Data management functions
         // INPUTS
         voidvec readFromInputQueues();
@@ -78,6 +93,7 @@ public:
         void block();
         void block_source();
         void block_sink();
+        // Block Runners
         void run();
         void run_source();
         void run_sink();
