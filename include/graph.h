@@ -25,6 +25,7 @@ public:
         std::vector<Worker*> Blocks;
         std::vector<std::string> Sources;
         std::vector<std::string> Sinks;
+        bool m_BenchMarking;
 
         // Destructor
         //~Graph();

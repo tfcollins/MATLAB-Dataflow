@@ -35,6 +35,7 @@ target_link_libraries(Benchmark
   ${Boost_TIMER_LIBRARY}
 )
 
+#set(CMAKE_CXX_FLAGS "-std=c++11 -g -Wall -lboost_thread -lboost_system -pthread -D BM")
 set(CMAKE_CXX_FLAGS "-std=c++11 -g -Wall -lboost_thread -lboost_system -pthread")
 
 

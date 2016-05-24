@@ -22,7 +22,9 @@
   #include <sys/prctl.h> //Needed for thread naming
 #endif
 
-#define BENCHMARKING true
+// Uncomment to always enable benchmarking otherwise rely on compiler flag
+// #define BENCHMARKING true
+
 #define TIMING_SAMPLES 1000000
 
 // #include "utils.h"
@@ -59,7 +61,7 @@ public:
         int m_NumInputs;
         int m_NumOutputs;
         // Parameters
-        std::atomic<bool>                              m_StopThread;
+        std::atomic<bool> m_StopThread;
         boost::thread m_BlockThread;
         // MIMO Parameters
         std::vector<boost::shared_ptr<std::atomic<int> > >            m_InputQueueSizes;

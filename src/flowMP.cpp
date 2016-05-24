@@ -93,9 +93,8 @@ void* Worker::readFromInputQueue(int inport)
           else if (m_StopThread)// If we have a stop signal return nothing
           { void* empty; return empty; }
         }
-        
+
         // Get New Data
-        void *data;
         (*(m_InputQueues[inport])).wait_dequeue(data);
         (*(m_InputQueueSizes[inport]))--;
 
@@ -173,9 +172,9 @@ void Worker::block()
 // Source Block
 void Worker::block_source()
 {
-    #ifdef UNIX
+        #ifdef UNIX
         prctl(PR_SET_NAME,m_BlockName.c_str(),0,0,0);
-    #endif
+        #endif
 
         // Delay startup, to make sure all blocks have started
         int usec = 1000;
@@ -226,9 +225,9 @@ void Worker::block_source()
 // Sink Block
 void Worker::block_sink()
 {
-    #ifdef UNIX
+        #ifdef UNIX
         prctl(PR_SET_NAME,m_BlockName.c_str(),0,0,0);
-    #endif
+        #endif
 
         voidvec data;
         voidvec processedData;

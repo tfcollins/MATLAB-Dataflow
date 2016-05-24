@@ -9,6 +9,7 @@
 Graph::Graph(std::string Name)
 {
     m_Name = Name;
+    m_BenchMarking = false;
 }
 
 // Destructor
@@ -24,6 +25,7 @@ void Graph::run(double duration)
                         if (((*Blocks[b]).m_BlockName).compare(Sinks[n])==0)
                         {
                                 //std::cout<<(*Blocks[b]).m_BlockName<<" is a sink\n";
+                                (*Blocks[b]).m_BenchMarking = m_BenchMarking;
                                 (*Blocks[b]).run_sink();
                         }
 
@@ -34,6 +36,7 @@ void Graph::run(double duration)
                             (((*Blocks[b]).m_BlockName).compare(Sources[n])!=0))
                         {
                                 //std::cout<<(*Blocks[b]).m_BlockName<<" is a block\n";
+                                (*Blocks[b]).m_BenchMarking = m_BenchMarking;
                                 (*Blocks[b]).run();
                         }
 
@@ -43,6 +46,7 @@ void Graph::run(double duration)
                         if (((*Blocks[b]).m_BlockName).compare(Sources[n])==0)
                         {
                                 //std::cout<<(*Blocks[b]).m_BlockName<<" is a source\n";
+                                (*Blocks[b]).m_BenchMarking = m_BenchMarking;
                                 (*Blocks[b]).run_source();
                         }
 

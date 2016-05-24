@@ -7,6 +7,7 @@ classdef GraphGenerator  < handle
     properties
         libname = 'RX'
         graphname = 'MyGraph'
+        enableBenchmarking = true;
         SimDurationSec = 60; % set SimDuration<=0 for continuous run
         blocks = {}
         blocksUniqueNames = {}
@@ -282,7 +283,7 @@ classdef GraphGenerator  < handle
             end
             f2t = unique(f2t);
             disp('Starting Build');
-            builder(f2t,self.libname);
+            builder(f2t,self.libname,self.enableBenchmarking);
         end
     end
 

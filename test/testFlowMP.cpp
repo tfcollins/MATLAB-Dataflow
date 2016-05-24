@@ -5,6 +5,8 @@
 //    #include <Windows.h>
 //#endif
 
+#define PRINT 0
+
 using namespace std;
 
 //***Block Definitions***//
@@ -34,9 +36,11 @@ OUTPUTS Sink(INPUTS input, int *flag)
     double *data = (double*) input[0];
 
     // Process
-    for(int index=0; index<10; index++)
-       cout << "data: " << data[index] << endl;
-
+    if (PRINT)
+    {
+      for(int index=0; index<10; index++)
+        cout << "data: " << data[index] << endl;
+    }
     //Cleanup
     delete data;
 
@@ -61,6 +65,9 @@ int main()
     //// Create graph and add blocks ////
     Graph TestGraph("2 Block Test Graph");
     TestGraph.Blocks = {&block1,&block2};
+
+    // Enable Benchmarking
+    block2.m_BenchMarkingCount = 1000;
 
     // Label Sources and Sinks (Strings from block thread names)
     TestGraph.Sources = {"SRC"};

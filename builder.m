@@ -1,9 +1,10 @@
-function result = builder(f2t,ofn)
+function result = builder(f2t,ofn,eb)
 % Function specific information
-global functionsToThread outputFunctionName; % Only way to pass to post codegen functions
+global functionsToThread outputFunctionName benchmarking; % Only way to pass to post codegen functions
 functionsToThread = f2t;%{'GenCRC','AddNoise','CheckCRC'};
 additionalSourceFiles = {'flowMP.h'};
 outputFunctionName = {ofn};%{'RX'};
+benchmarking = eb;
 
 % Include mfiles
 addpath(genpath('mfiles'));
