@@ -3,44 +3,6 @@
 //#include "RX_emxutil.h"
 
 /////////////////////////////////////////////////
-OUTPUTS GenCRCBLK(INPUTS input, int *flag)
-{
-    // No Inputs
-
-    // Setup output(s)
-    boolean_T *output = new boolean_T[18];
-
-    // MATLAB Function Call
-    GenCRC(output);
-
-    // Send Out
-    *flag = 1;
-    return SendOut(output);
-
-}
-
-/////////////////////////////////////////////////
-OUTPUTS AddNoiseBLK(INPUTS input, int *flag)
-{
-    // Get input(s)
-    const boolean_T *signal = (const boolean_T*) input[0];
-
-    // Setup output(s)
-    double *sigWithNoise = new double[18];
-
-    // MATLAB Function Call
-    AddNoise(signal,sigWithNoise);
-
-    // Cleanup
-    delete signal;
-
-    // Send Out
-    *flag = 1;
-    return SendOut(sigWithNoise);
-
-}
-
-/////////////////////////////////////////////////
 OUTPUTS CheckCRCBLK(INPUTS input, int *flag)
 {
     // Get input(s)
@@ -56,6 +18,23 @@ OUTPUTS CheckCRCBLK(INPUTS input, int *flag)
 
     // Send Nothing
     return SendOut(none);
+
+}
+
+/////////////////////////////////////////////////
+OUTPUTS GenCRCBLK(INPUTS input, int *flag)
+{
+    // No Inputs
+
+    // Setup output(s)
+    boolean_T *output = new boolean_T[18];
+
+    // MATLAB Function Call
+    GenCRC(output);
+
+    // Send Out
+    *flag = 1;
+    return SendOut(output);
 
 }
 //[EOF]

@@ -8,7 +8,7 @@ import CppHeaderParser
 # 2. Get C++ names from headers
 # 3. Write blocks headers
 
-hroot = 'codegen/exe/RX/'
+hroot = 'codegen/exe/'
 mroot = 'mfiles/'
 functions =['CheckCRC','GenCRC']
 
@@ -65,14 +65,13 @@ def Get_IN_OUT_Variables(func):
     txt = f.read()
     outs = get_outputs(txt)
     ins = get_inputs(txt)
-
     sig = {'in':ins,'out':outs}
     return sig
 
-def Get_Cpp_Names(funcname,sigs):
+def Get_Cpp_Names(funcname,sigs,outname):
     # Get C++ Names
     try:
-        cppHeader = CppHeaderParser.CppHeader(hroot+funcname+'.h')
+        cppHeader = CppHeaderParser.CppHeader(hroot+outname+'/'+funcname+'.h')
     except CppHeaderParser.CppParseError as e:
         print(e)
         sys.exit(1)
@@ -168,14 +167,18 @@ def WriteBlockCode(funcTemplate):
     # Done
     return instr
 
-def ProcessFunctions(functions):
+def ProcessFunctions(functions,outname):
     BC = []
     # Form all functions
     for func in functions:
         # Get function signatures from MATLAB
         sigs = Get_IN_OUT_Variables(func)
         # Get signature from CPP Headers
-        template = Get_Cpp_Names(func,sigs)
+        template = Get_Cpp_Names(func,sigs,outname)
+        # print "Inputs"
+        # print template.Inputs
+        # print "Outputs"
+        # print template.Outputs
         # Write CPP block header code
         BC.append( WriteBlockCode(template) )
 
@@ -188,7 +191,8 @@ def ProcessFunctions(functions):
     return BlocksHeader
 
 # MAIN
-functions = sys.argv[1:]
-BlocksHeader = ProcessFunctions(functions)
+functions = sys.argv[1:-1]
+outname = sys.argv[-1]
+BlocksHeader = ProcessFunctions(functions,outname)
 print BlocksHeader
 #print '----------------------------------'

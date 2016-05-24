@@ -24,11 +24,17 @@ Worker::Worker(std::function<voidvec(voidvec,int*)> ProcessData,
         m_FunctionCleanup = FunctionCleanup;
         m_BlockName = BlockName;
 
+        // Extra Benchmarking Parameters
+        m_BenchMarkComplete = false;
+        m_BenchMarkingCount = 1000;
+        m_BenchMarkingStarts = std::vector<std::chrono::high_resolution_clock::time_point>(TIMING_SAMPLES);
+        m_BenchMarkingEnds = std::vector<std::chrono::high_resolution_clock::time_point>(TIMING_SAMPLES);
+
         //Setup Ports
         for(int port=0; port<numInputs; port++)
         {
-                // boost::shared_ptr<std::atomic<int> > sptr (new std::atomic<int>(0));
-                // m_InputQueueSizes.push_back(sptr);
+                boost::shared_ptr<std::atomic<int> > sptr (new std::atomic<int>(0));
+                m_InputQueueSizes.push_back(sptr);
                 // boost::shared_ptr<boost::mutex> sptr2 (new boost::mutex);
                 // m_InputMutexs.push_back(sptr2);
                 boost::shared_ptr<boost::condition_variable> sptr3 (new boost::condition_variable);
@@ -39,8 +45,8 @@ Worker::Worker(std::function<voidvec(voidvec,int*)> ProcessData,
         }
         for(int port=0; port<numOutputs; port++)
         {
-                // boost::shared_ptr<std::atomic<int> > sptr (new std::atomic<int>(0));
-                // m_OutputQueueSizes.push_back(sptr);
+                boost::shared_ptr<std::atomic<int> > sptr (new std::atomic<int>(0));
+                m_OutputQueueSizes.push_back(sptr);
                 // boost::shared_ptr<boost::mutex> sptr2 (new boost::mutex);
                 // m_OutputMutexs.push_back(sptr2);
                 boost::shared_ptr<boost::condition_variable> sptr3 (new boost::condition_variable);
@@ -87,6 +93,11 @@ void* Worker::readFromInputQueue(int inport)
           else if (m_StopThread)// If we have a stop signal return nothing
           { void* empty; return empty; }
         }
+        
+        // Get New Data
+        void *data;
+        (*(m_InputQueues[inport])).wait_dequeue(data);
+        (*(m_InputQueueSizes[inport]))--;
 
 
 }
@@ -104,8 +115,17 @@ void Worker::addToOutputQueues(voidvec ProcessedDataVector)
 // Output data to next block
 void Worker::addToOutputQueue(void* processedData, int outport)
 {
+        while ( (*(m_OutputQueueSizes[outport])) > WARNINGQSIZE )
+        {
+                // Sleeping for this amount is faster than waiting for a signal
+                // from downstream blocks
+                const int usec = 10;
+                boost::this_thread::sleep(boost::posix_time::microseconds(usec));
+        }
+
         // Add data to queue
         (*(m_OutputQueues[outport])).enqueue(processedData);
+        (*(m_OutputQueueSizes[outport]))++;
 }
 
 // Notify all connected blocks (this being a source to them)
@@ -165,6 +185,12 @@ void Worker::block_source()
         voidvec processedData;
         int flag = 0;
 
+        #ifdef BENCHMARKING
+        std::cout<<"Benchmark Started\n";
+        m_BM_START = std::chrono::high_resolution_clock::now();
+        int count = 0;
+        #endif
+
         // Initialize threaded function
         m_FunctionInit();
 
@@ -174,6 +200,14 @@ void Worker::block_source()
                 processedData = m_ProcessData(data, &flag);
                 if (m_StopThread)
                         break;
+
+                #ifdef BENCHMARKING
+                if (count<TIMING_SAMPLES)
+                {
+                        m_BenchMarkingStarts[count] = std::chrono::high_resolution_clock::now();
+                        count++;
+                }
+                #endif
 
                 //Output Data
                 if (flag>0)
@@ -200,6 +234,10 @@ void Worker::block_sink()
         voidvec processedData;
         int flag = 0;
 
+        #ifdef BENCHMARKING
+        int count = 0;
+        #endif
+
         // Initialize threaded function
         m_FunctionInit();
 
@@ -210,8 +248,23 @@ void Worker::block_sink()
                 if (m_StopThread)
                         break;
 
+                #ifdef BENCHMARKING
+                if (count<TIMING_SAMPLES)
+                    m_BenchMarkingEnds[count] = std::chrono::high_resolution_clock::now();
+                #endif
+
                 //Process Data
                 processedData = m_ProcessData(data,&flag);
+
+                #ifdef BENCHMARKING
+                count++;
+                if (count==m_BenchMarkingCount)
+                {
+                  m_BM_END = std::chrono::high_resolution_clock::now();
+                  std::cout<<"Benchmark Done\n";
+                  m_BenchMarkComplete = true;
+                }
+                #endif
         }
         // std::cout<<"Sink block finished\n";
 
@@ -243,8 +296,8 @@ void connect(Worker &aBlock, int outport, Worker &bBlock, int inport)
 	// bBlock.m_InputMutexs[inport] = aBlock.m_OutputMutexs[outport];
 	// // Map conditionals
 	// bBlock.m_InputConds[inport] = aBlock.m_OutputConds[outport];
-  // // Map atomics
-	// bBlock.m_InputQueueSizes[inport] = aBlock.m_OutputQueueSizes[outport];
+    // Map atomics
+	bBlock.m_InputQueueSizes[inport] = aBlock.m_OutputQueueSizes[outport];
 	// Map queues
 	bBlock.m_InputQueues[inport] = aBlock.m_OutputQueues[outport];
 }

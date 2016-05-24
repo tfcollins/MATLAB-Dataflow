@@ -1,5 +1,5 @@
 function setbuildargsBoost(buildInfo)
-global functionsToThread;
+global functionsToThread outputFunctionName;
 % The example being compiled requires threading support.
 % The flag requests that the thread library be included
 % in the build
@@ -23,4 +23,4 @@ global functionsToThread;
     %addSysLibs(buildInfo, library);
 
     % Generate header blocks
-    system(['python2 process_header.py ',strjoin(functionsToThread,' '),' >include/blocks_gen.h']);
+    system(['python process_header.py ',strjoin(functionsToThread,' '),' ',outputFunctionName{:},' >include/blocks_gen.h']);

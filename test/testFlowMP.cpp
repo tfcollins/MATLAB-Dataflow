@@ -34,8 +34,8 @@ OUTPUTS Sink(INPUTS input, int *flag)
     double *data = (double*) input[0];
 
     // Process
-    // for(int index=0; index<10; index++)
-    //    cout << "data: " << data[index] << endl;
+    for(int index=0; index<10; index++)
+       cout << "data: " << data[index] << endl;
 
     //Cleanup
     delete data;
