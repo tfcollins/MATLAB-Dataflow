@@ -86,6 +86,10 @@ classdef GraphGenerator  < handle
         %% Write C++ Code For Flowgraph SRC file
         function WriteCode(self,benchmark)
 
+            % Input: benchmark
+            % This is the number of data segments to pass through the graph
+            % to measure total benchmark time
+            
             % Write Backend stuff
             main = {'// Backend dataflow',...
                 '#include "flowMP.h"',...
@@ -284,6 +288,11 @@ classdef GraphGenerator  < handle
             f2t = unique(f2t);
             disp('Starting Build');
             builder(f2t,self.libname,self.enableBenchmarking);
+        end
+        
+        %% Run Flowgraph
+        function Run(self)
+           system(['unset LD_LIBRARY_PATH; ./',self.libname]); 
         end
     end
 

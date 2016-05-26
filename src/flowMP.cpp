@@ -26,7 +26,7 @@ Worker::Worker(std::function<voidvec(voidvec,int*)> ProcessData,
 
         // Extra Benchmarking Parameters
         m_BenchMarkComplete = false;
-        m_BenchMarkingCount = 1000;
+        m_BenchMarkingCount = 1000; // For End-To-End Simulation
         m_BenchMarkingStarts = std::vector<std::chrono::high_resolution_clock::time_point>(TIMING_SAMPLES);
         m_BenchMarkingEnds = std::vector<std::chrono::high_resolution_clock::time_point>(TIMING_SAMPLES);
 
@@ -89,14 +89,17 @@ void* Worker::readFromInputQueue(int inport)
           succeeded = (*(m_InputQueues[inport])).wait_dequeue_timed(data,std::chrono::milliseconds(5));
 
           if (succeeded)// If we have data return
-            { return data; }
+          {
+            (*(m_InputQueueSizes[inport]))--;
+            return data;
+          }
           else if (m_StopThread)// If we have a stop signal return nothing
           { void* empty; return empty; }
         }
 
-        // Get New Data
-        (*(m_InputQueues[inport])).wait_dequeue(data);
-        (*(m_InputQueueSizes[inport]))--;
+        // // Get New Data
+        // std::cout << "In Q Size: " << (*(m_InputQueueSizes[inport])) << std::endl;
+        // (*(m_InputQueues[inport])).wait_dequeue(data);
 
 
 }
@@ -114,6 +117,7 @@ void Worker::addToOutputQueues(voidvec ProcessedDataVector)
 // Output data to next block
 void Worker::addToOutputQueue(void* processedData, int outport)
 {
+        // std::cout << "Out Q Size: " << (*(m_OutputQueueSizes[outport])) << std::endl;
         while ( (*(m_OutputQueueSizes[outport])) > WARNINGQSIZE )
         {
                 // Sleeping for this amount is faster than waiting for a signal
@@ -195,11 +199,12 @@ void Worker::block_source()
 
         while (!m_StopThread)
         {
-                //Process Data
+                // Process Data
                 processedData = m_ProcessData(data, &flag);
                 if (m_StopThread)
                         break;
 
+                // Measure start time of block transfer
                 #ifdef BENCHMARKING
                 if (count<TIMING_SAMPLES)
                 {
@@ -247,6 +252,7 @@ void Worker::block_sink()
                 if (m_StopThread)
                         break;
 
+                // Measure Block Transfer Timings
                 #ifdef BENCHMARKING
                 if (count<TIMING_SAMPLES)
                     m_BenchMarkingEnds[count] = std::chrono::high_resolution_clock::now();
@@ -255,6 +261,7 @@ void Worker::block_sink()
                 //Process Data
                 processedData = m_ProcessData(data,&flag);
 
+                // Measure Graph End-To-End Transfer Time Over Multiple Transfers
                 #ifdef BENCHMARKING
                 count++;
                 if (count==m_BenchMarkingCount)

@@ -3,18 +3,18 @@
 //#include "RX_emxutil.h"
 
 /////////////////////////////////////////////////
-OUTPUTS CheckCRCBLK(INPUTS input, int *flag)
+OUTPUTS DumpSignalBLK(INPUTS input, int *flag)
 {
     // Get input(s)
-    const double *codeword = (const double*) input[0];
+    const creal_T *dataSig = (const creal_T*) input[0];
 
     // No outputs
 
     // MATLAB Function Call
-    CheckCRC(codeword);
+    DumpSignal(dataSig);
 
     // Cleanup
-    delete codeword;
+    delete dataSig;
 
     // Send Nothing
     return SendOut(none);
@@ -22,15 +22,15 @@ OUTPUTS CheckCRCBLK(INPUTS input, int *flag)
 }
 
 /////////////////////////////////////////////////
-OUTPUTS GenCRCBLK(INPUTS input, int *flag)
+OUTPUTS GenSignalBLK(INPUTS input, int *flag)
 {
     // No Inputs
 
     // Setup output(s)
-    boolean_T *output = new boolean_T[18];
+    creal_T *output = new creal_T[64];
 
     // MATLAB Function Call
-    GenCRC(output);
+    GenSignal(output);
 
     // Send Out
     *flag = 1;

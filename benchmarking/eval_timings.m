@@ -1,6 +1,8 @@
 
-%% Initialize variables.
-filename = '/home/travis/git/MATLAB-Dataflow/build/DataPassingTimes.txt';
+function [x,c] = eval_timings(numBins)
+
+%% Initialize variables
+filename = '/home/travis/git/MATLAB-Dataflow/DataPassingTimes.txt';
 startRow = 2;
 
 formatSpec = '%5s%20s%s%[^\n\r]';
@@ -58,12 +60,13 @@ timings = cell2mat(raw(:, 1));
 starts = cell2mat(raw(:, 2));
 stops = cell2mat(raw(:, 3));
 
-[N,x] = hist(timings,1000);
+timings = timings(20:end);
+
+[N,x] = hist(timings,numBins);
 Probs = N./sum(N);
 c = cumsum(Probs);
 %cdf(i,:) = c;
 %X(i,:) = x;
-plot(x,c);
 
 
 

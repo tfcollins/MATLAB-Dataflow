@@ -1,7 +1,7 @@
 function sigWithNoise = AddNoise(signal)
 
 % Asserts
-assert(isa(signal, 'logical') && isreal(signal) && all(size(signal) == [18,1]))
+assert(isa(signal, 'logical') && isreal(signal) && all(size(signal) == [64,1]))
 
 persistent AWGN
 if isempty(AWGN)
