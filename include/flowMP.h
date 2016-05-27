@@ -21,6 +21,7 @@
 #ifdef UNIX
   #include <sys/prctl.h> //Needed for thread naming
 #endif
+#include <memory>
 
 // Uncomment to always enable benchmarking otherwise rely on compiler flag
 // #define BENCHMARKING true
@@ -37,9 +38,12 @@
 //std::function<void()> blankTemp = blankz;
 
 // Type declarations
-typedef std::vector<void*> voidvec;
-typedef std::vector<void*> OUTPUTS;
-typedef std::vector<void*> INPUTS;
+// typedef std::shared_ptr<void> sptr_void_s;
+typedef void* sptr_void_s;
+typedef std::vector<sptr_void_s> voidvec;
+typedef std::vector<sptr_void_s> OUTPUTS;
+typedef std::vector<sptr_void_s> INPUTS;
+
 
 // Class to be threaded
 class Worker
@@ -64,14 +68,14 @@ public:
         std::atomic<bool> m_StopThread;
         boost::thread m_BlockThread;
         // MIMO Parameters
-        std::vector<boost::shared_ptr<std::atomic<int> > >            m_InputQueueSizes;
-        std::vector<boost::shared_ptr<std::atomic<int> > >            m_OutputQueueSizes;
+        std::vector<boost::shared_ptr<std::atomic<int> > > m_InputQueueSizes;
+        std::vector<boost::shared_ptr<std::atomic<int> > > m_OutputQueueSizes;
         std::vector<boost::shared_ptr<boost::mutex> >                m_InputMutexs;
         std::vector<boost::shared_ptr<boost::mutex> >                m_OutputMutexs;
         std::vector<boost::shared_ptr<boost::condition_variable> >   m_InputConds;
         std::vector<boost::shared_ptr<boost::condition_variable> >   m_OutputConds;
-        std::vector<boost::shared_ptr<moodycamel::BlockingReaderWriterQueue<void*> > >           m_InputQueues;
-        std::vector<boost::shared_ptr<moodycamel::BlockingReaderWriterQueue<void*> > >           m_OutputQueues;
+        std::vector<boost::shared_ptr<moodycamel::BlockingReaderWriterQueue<sptr_void_s> > >           m_InputQueues;
+        std::vector<boost::shared_ptr<moodycamel::BlockingReaderWriterQueue<sptr_void_s> > >           m_OutputQueues;
         std::string m_BlockName;
 
         // Extra Benchmarking Parameters
@@ -86,10 +90,10 @@ public:
         // Data management functions
         // INPUTS
         voidvec readFromInputQueues();
-        void* readFromInputQueue(int inport);
+        sptr_void_s readFromInputQueue(int inport);
         // OUTPUTS
         void addToOutputQueues(voidvec ProcessedDataVector);
-        void addToOutputQueue(void* processedData, int outport);
+        void addToOutputQueue(sptr_void_s processedData, int outport);
         void notifyConnectedBlocks();
         // In and Out Process Block
         void block();

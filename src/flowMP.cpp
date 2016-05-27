@@ -39,8 +39,8 @@ Worker::Worker(std::function<voidvec(voidvec,int*)> ProcessData,
                 // m_InputMutexs.push_back(sptr2);
                 boost::shared_ptr<boost::condition_variable> sptr3 (new boost::condition_variable);
                 m_InputConds.push_back(sptr3);
-                // boost::shared_ptr<std::queue<void*> > sptr4 (new std::queue<void*>);
-                boost::shared_ptr<moodycamel::BlockingReaderWriterQueue<void*>> sptr4 (new moodycamel::BlockingReaderWriterQueue<void*>);
+                // boost::shared_ptr<std::queue<sptr_void_s> > sptr4 (new std::queue<sptr_void_s>);
+                boost::shared_ptr<moodycamel::BlockingReaderWriterQueue<sptr_void_s>> sptr4 (new moodycamel::BlockingReaderWriterQueue<sptr_void_s>);
                 m_InputQueues.push_back(sptr4);
         }
         for(int port=0; port<numOutputs; port++)
@@ -51,8 +51,8 @@ Worker::Worker(std::function<voidvec(voidvec,int*)> ProcessData,
                 // m_OutputMutexs.push_back(sptr2);
                 boost::shared_ptr<boost::condition_variable> sptr3 (new boost::condition_variable);
                 m_OutputConds.push_back(sptr3);
-                // boost::shared_ptr<std::queue<void*> > sptr4 (new std::queue<void*>);
-                boost::shared_ptr<moodycamel::BlockingReaderWriterQueue<void*>> sptr4 (new moodycamel::BlockingReaderWriterQueue<void*>);
+                // boost::shared_ptr<std::queue<sptr_void_s> > sptr4 (new std::queue<sptr_void_s>);
+                boost::shared_ptr<moodycamel::BlockingReaderWriterQueue<sptr_void_s>> sptr4 (new moodycamel::BlockingReaderWriterQueue<sptr_void_s>);
                 m_OutputQueues.push_back(sptr4);
         }
 
@@ -76,10 +76,10 @@ voidvec Worker::readFromInputQueues()
 
 }
 // Get data from queue
-void* Worker::readFromInputQueue(int inport)
+sptr_void_s Worker::readFromInputQueue(int inport)
 {
         // Get New Data From Upstream Block
-        void *data;
+        sptr_void_s data;
         bool succeeded;
 
         // Wait for new data
@@ -94,7 +94,9 @@ void* Worker::readFromInputQueue(int inport)
             return data;
           }
           else if (m_StopThread)// If we have a stop signal return nothing
-          { void* empty; return empty; }
+          {
+            return nullptr;
+          }
         }
 
         // // Get New Data
@@ -115,7 +117,7 @@ void Worker::addToOutputQueues(voidvec ProcessedDataVector)
 }
 
 // Output data to next block
-void Worker::addToOutputQueue(void* processedData, int outport)
+void Worker::addToOutputQueue(sptr_void_s processedData, int outport)
 {
         // std::cout << "Out Q Size: " << (*(m_OutputQueueSizes[outport])) << std::endl;
         while ( (*(m_OutputQueueSizes[outport])) > WARNINGQSIZE )
@@ -142,9 +144,10 @@ void Worker::notifyConnectedBlocks()
 // In and Out Process Block
 void Worker::block()
 {
-    #ifdef UNIX
+        #ifdef UNIX
         prctl(PR_SET_NAME,m_BlockName.c_str(),0,0,0);
-    #endif
+        #endif
+
         voidvec data;
         voidvec processedData;
         int flag = 0;
@@ -169,8 +172,9 @@ void Worker::block()
         m_FunctionCleanup();
 
         // Notify when thread completes
+        #ifdef DEBUG
         std::cout << "Thread Done: " << m_BlockName << " ID: " << boost::this_thread::get_id() << '\n';
-
+        #endif
 }
 
 // Source Block

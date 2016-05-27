@@ -4,25 +4,27 @@
 #define UTILS_H
 
 // Blank data, used for sink return calls
-void* none;
+sptr_void_s none;
 
 template<class T>
-void* consumeOut(T in)
+sptr_void_s consumeOut(T in)
 {
-        return (void*) in;
+        return (sptr_void_s) in;
 }
 
-// Consume Outputs to create void* output vector
+// Consume Outputs to create sptr_void_s output vector
 template<typename U>
 void Push_back(voidvec &items, U item)
 {
-        items.push_back((void*)item);
+        items.push_back((sptr_void_s)item);
 }
 
 template<typename U, typename ...Args>
 void Push_back(voidvec &items, U item, Args ...args)
 {
-        items.push_back((void*)item);
+        sptr_void_s tmp ((void*)item);
+        // items.push_back((sptr_void_s)item);
+        items.push_back(tmp);
         Push_back( items, args... );
 }
 

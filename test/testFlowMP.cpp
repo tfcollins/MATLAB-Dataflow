@@ -23,26 +23,41 @@ OUTPUTS Source(INPUTS input, int *flag)
 
     // Process
     for(int index=0; index<10; index++)
-        data[index] = index;
+        data[index] = 1.0*index+1;
 
     //Enable pass to next block
     *flag = 1;
     return SendOut(data);
 }
+
+OUTPUTS DoNothingBLK(INPUTS input, int *flag)
+{
+  // Get input
+  std::shared_ptr<double> data ((double*) input[0]);
+
+  // Setup output
+  double *data2 = new double[10];
+
+  // Process
+  std::memcpy(data2,data.get(),sizeof(double)*10);
+
+  *flag = 1;
+  return SendOut(data2);
+}
+
+
 /////////////////////////////////////////////////
 OUTPUTS Sink(INPUTS input, int *flag)
 {
     // Get input
-    double *data = (double*) input[0];
+    std::shared_ptr<double> ddata ((double*) input[0]);
 
     // Process
     if (PRINT)
     {
       for(int index=0; index<10; index++)
-        cout << "data: " << data[index] << endl;
+        cout << "data: " << *(ddata.get()+index) << endl;
     }
-    //Cleanup
-    delete data;
 
     //Disable pass to next block
     *flag = 0;
@@ -57,14 +72,16 @@ int main()
 {
     // Create instances of blocks
     Worker block1(Source, 0, 1, doNothing, doNothing, "SRC");
-    Worker block2(Sink, 1, 0, doNothing, doNothing, "SINK");
+    Worker block2(DoNothingBLK, 1, 1, doNothing, doNothing, "DN");
+    Worker block3(Sink, 1, 0, doNothing, doNothing, "SINK");
 
     // Connect blocks together
     connect(block1, 0, block2, 0);
+    connect(block2, 0, block3, 0);
 
     //// Create graph and add blocks ////
     Graph TestGraph("2 Block Test Graph");
-    TestGraph.Blocks = {&block1,&block2};
+    TestGraph.Blocks = {&block1,&block2,&block3};
 
     // Enable Benchmarking
     block2.m_BenchMarkingCount = 1000;
