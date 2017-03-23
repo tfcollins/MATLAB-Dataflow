@@ -11,4 +11,4 @@ Required Packages/Software
  - MATLAB R2014a+ (Have not tested with previous versions)
 
  Acknowledgements  
- - Thanks to Cameron Desrochers nonblocking queue code `readerwriterqueue`  
+ - Thanks to Cameron Desrochers nonblocking queue code `readerwriterqueue`.  It has some speed advantage over `boost::lockfree::spsc_queue`
