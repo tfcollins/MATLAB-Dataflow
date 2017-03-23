@@ -6,9 +6,12 @@ This work provids thread level pipelining of MATLAB functions as well as general
 
 Required Packages/Software  
  - Python2
+ - libboost1.54-all-dev
  - cmake (For testing only)
  - CppHeaderParser `sudo pip install CppHeaderParser`
  - MATLAB R2014a+ (Have not tested with previous versions)
+
+Note I have only tested this on linux, but should work on other platforms assuming you can meet the package requirements.
 
  Acknowledgements  
  - Thanks to Cameron Desrochers nonblocking queue code `readerwriterqueue`.  It has some speed advantage over `boost::lockfree::spsc_queue`
